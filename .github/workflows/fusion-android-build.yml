@@ -13,7 +13,7 @@ jobs:
   android-debug:
     name: Android Debug APK
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
 
     steps:
       - name: Check out git repository
@@ -32,8 +32,20 @@ jobs:
           java-version: '21'
           cache: gradle
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      # ubuntu-latest 镜像自带 Android SDK（ANDROID_SDK_ROOT），这里只补装项目需要的包
+      - name: Install Android SDK packages
+        shell: bash
+        run: |
+          SDKMANAGER="${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then
+            SDKMANAGER="${ANDROID_SDK_ROOT}/cmdline-tools/bin/sdkmanager"
+          fi
+          yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
+          "$SDKMANAGER" \
+            "platform-tools" \
+            "platforms;android-36" \
+            "build-tools;35.0.0" \
+            "ndk;26.1.10909125"
 
       - name: Cache Gradle
         uses: actions/cache@v4
@@ -60,7 +72,7 @@ jobs:
         working-directory: android
         env:
           DISABLE_SVG: 1
-        run: ./gradlew :app:assembleDebug -PreactNativeArchitectures=arm64-v8a --no-daemon
+        run: ./gradlew :app:assembleDebug -PreactNativeArchitectures=arm64-v8a --no-daemon --max-workers=2
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
