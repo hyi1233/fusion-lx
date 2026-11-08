@@ -232,6 +232,11 @@ declare global {
       'playDetail.isShowLyricProgressSetting': boolean
 
       /**
+       * 播放详情页-Folia 动态歌词模式
+       */
+      'playDetail.style.foliaMode': string
+
+      /**
        * 是否启用桌面歌词
        */
       'desktopLyric.enable': boolean
