@@ -11,6 +11,22 @@
 // 会自动判定格式并转成 Folia 的逐字行——所以壳这边不需要复制一份转换器。
 
 export const FOLIA_BRIDGE_VERSION = 1
+
+/** 封面背景的模糊档位。 */
+export type FoliaBlurLevel = 'weak' | 'medium' | 'strong'
+
+/** 效果强度（混乱程度）档位：静止 / 微动 / 标准 / 狂暴。 */
+export type FoliaIntensityLevel = 'still' | 'subtle' | 'normal' | 'chaotic'
+
+export const FOLIA_BLUR_LEVELS: readonly FoliaBlurLevel[] = ['weak', 'medium', 'strong']
+
+export const FOLIA_INTENSITY_LEVELS: readonly FoliaIntensityLevel[] = ['still', 'subtle', 'normal', 'chaotic']
+
+export const isFoliaBlurLevel = (value: unknown): value is FoliaBlurLevel =>
+  typeof value === 'string' && (FOLIA_BLUR_LEVELS as readonly string[]).includes(value)
+
+export const isFoliaIntensityLevel = (value: unknown): value is FoliaIntensityLevel =>
+  typeof value === 'string' && (FOLIA_INTENSITY_LEVELS as readonly string[]).includes(value)
 export const FOLIA_BRIDGE_SOURCE = 'folia-webview'
 
 /** 洛雪行（发给页面侧的形状）。`time` 单位是**秒**（洛雪内部是毫秒，发之前要除 1000）。 */
@@ -42,6 +58,22 @@ export interface SetModeCommand {
   mode: string
 }
 
+export interface SetBackdropCommand {
+  type: 'setBackdrop'
+  /** 是否用封面图做背景层 */
+  cover: boolean
+  /** 封面背景的模糊强度 */
+  blur: FoliaBlurLevel
+  /** 是否在背景上叠一层暗化 */
+  dim: boolean
+}
+
+export interface SetIntensityCommand {
+  type: 'setIntensity'
+  /** 效果强度（混乱程度） */
+  level: FoliaIntensityLevel
+}
+
 export interface ShowControlsCommand {
   type: 'showControls'
   visible: boolean
@@ -51,6 +83,8 @@ export type FoliaBridgeCommand =
   | SetLinesCommand
   | SetCurrentTimeCommand
   | SetModeCommand
+  | SetBackdropCommand
+  | SetIntensityCommand
   | ShowControlsCommand
 
 export type FoliaBridgeEventPayload =

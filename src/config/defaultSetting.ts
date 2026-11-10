@@ -42,6 +42,10 @@ const defaultSetting: LX.AppSetting = {
   'playDetail.horizontal.style.lrcFontSize': 220,
   'playDetail.isShowLyricProgressSetting': false,
   'playDetail.style.foliaMode': 'classic',
+  'playDetail.style.foliaCover': true,
+  'playDetail.style.foliaBlur': 'medium',
+  'playDetail.style.foliaDim': true,
+  'playDetail.style.foliaIntensity': 'normal',
 
   'desktopLyric.enable': false,
   'desktopLyric.isLock': false,

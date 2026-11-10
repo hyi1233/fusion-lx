@@ -27,9 +27,13 @@ import { useIsPlay, usePlayerMusicInfo, useProgress } from '@/store/player/hook'
 import { useSettingValue } from '@/store/setting/hook'
 import { startFoliaAssetServer } from '@/utils/nativeModules/folia'
 import {
+  isFoliaBlurLevel,
+  isFoliaIntensityLevel,
   parseBridgeEvent,
   serializeBridgeCommand,
   type FoliaBridgeCommand,
+  type FoliaBlurLevel,
+  type FoliaIntensityLevel,
 } from '@/merge/bridgeProtocol'
 import { DEFAULT_FOLIA_VISUALIZER_MODE, isFoliaVisualizerMode } from './modes'
 
@@ -71,6 +75,15 @@ export default function FoliaLyricStage({ style }: FoliaLyricStageProps) {
   // 设置里的模式可能来自旧版本/外部写入，非法值回落到默认模式（否则页面会回一条 error）。
   const mode = isFoliaVisualizerMode(settingMode) ? settingMode : DEFAULT_FOLIA_VISUALIZER_MODE
   const playbackRate = useSettingValue('player.playbackRate')
+  // F3：背景与混乱效果的设置（写进 setting 后由这里推给页面）
+  const settingCover = useSettingValue('playDetail.style.foliaCover')
+  const settingBlur = useSettingValue('playDetail.style.foliaBlur')
+  const settingDim = useSettingValue('playDetail.style.foliaDim')
+  const settingIntensity = useSettingValue('playDetail.style.foliaIntensity')
+
+  // 设置可能来自旧版本/外部写入，非法值回落到默认。
+  const blur: FoliaBlurLevel = isFoliaBlurLevel(settingBlur) ? settingBlur : 'medium'
+  const intensity: FoliaIntensityLevel = isFoliaIntensityLevel(settingIntensity) ? settingIntensity : 'normal'
 
   const [pageUrl, setPageUrl] = useState<string | null>(null)
 
@@ -99,6 +112,10 @@ export default function FoliaLyricStage({ style }: FoliaLyricStageProps) {
   linesRef.current = linesPayload
   const modeRef = useRef(mode)
   modeRef.current = mode
+  const blurRef = useRef(blur)
+  blurRef.current = blur
+  const intensityRef = useRef(intensity)
+  intensityRef.current = intensity
   const metaRef = useRef({ maxPlayTime, musicInfo })
   metaRef.current = { maxPlayTime, musicInfo }
 
@@ -127,6 +144,19 @@ export default function FoliaLyricStage({ style }: FoliaLyricStageProps) {
 
   const pushMode = useCallback(() => {
     sendCommand({ type: 'setMode', mode: modeRef.current })
+  }, [sendCommand])
+
+  const pushBackdrop = useCallback(() => {
+    sendCommand({
+      type: 'setBackdrop',
+      cover: !!settingCover,
+      blur: blurRef.current,
+      dim: !!settingDim,
+    })
+  }, [sendCommand, settingCover, settingDim])
+
+  const pushIntensity = useCallback(() => {
+    sendCommand({ type: 'setIntensity', level: intensityRef.current })
   }, [sendCommand])
 
   const pushTime = useCallback((time: number) => {
@@ -164,6 +194,18 @@ export default function FoliaLyricStage({ style }: FoliaLyricStageProps) {
     if (!pageReadyRef.current) return
     pushMode()
   }, [mode, pushMode])
+
+  // 背景设置变化 → 通知页面
+  useEffect(() => {
+    if (!pageReadyRef.current) return
+    pushBackdrop()
+  }, [blur, pushBackdrop, settingCover, settingDim])
+
+  // 混乱效果强度变化 → 通知页面
+  useEffect(() => {
+    if (!pageReadyRef.current) return
+    pushIntensity()
+  }, [intensity, pushIntensity])
 
   // 播放进度（10Hz）
   useEffect(() => {
@@ -203,6 +245,8 @@ export default function FoliaLyricStage({ style }: FoliaLyricStageProps) {
         pageReadyRef.current = true
         pushLines()
         pushMode()
+        pushBackdrop()
+        pushIntensity()
         break
       case 'error':
         // 页面侧命令解析/应用失败：只记日志，不打断播放
@@ -211,7 +255,7 @@ export default function FoliaLyricStage({ style }: FoliaLyricStageProps) {
       default:
         break
     }
-  }, [pushLines, pushMode])
+  }, [pushBackdrop, pushIntensity, pushLines, pushMode])
 
   if (!pageUrl) return <View style={[styles.container, style]} />
 

@@ -237,6 +237,26 @@ declare global {
       'playDetail.style.foliaMode': string
 
       /**
+       * 播放详情页-Folia 动态歌词-是否用封面作为背景
+       */
+      'playDetail.style.foliaCover': boolean
+
+      /**
+       * 播放详情页-Folia 动态歌词-封面背景模糊强度
+       */
+      'playDetail.style.foliaBlur': 'weak' | 'medium' | 'strong'
+
+      /**
+       * 播放详情页-Folia 动态歌词-是否压暗封面背景
+       */
+      'playDetail.style.foliaDim': boolean
+
+      /**
+       * 播放详情页-Folia 动态歌词-效果强度（混乱效果）
+       */
+      'playDetail.style.foliaIntensity': 'still' | 'subtle' | 'normal' | 'chaotic'
+
+      /**
        * 是否启用桌面歌词
        */
       'desktopLyric.enable': boolean
