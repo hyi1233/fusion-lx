@@ -43,6 +43,7 @@ export default function FoliaStylePicker({ style }: FoliaStylePickerProps) {
   const theme = useTheme()
   const popupRef = useRef<PopupType>(null)
 
+  const langId = useSettingValue('common.langId')
   const mode = useSettingValue('playDetail.style.foliaMode')
   const cover = useSettingValue('playDetail.style.foliaCover')
   const blur = useSettingValue('playDetail.style.foliaBlur')
@@ -71,15 +72,15 @@ export default function FoliaStylePicker({ style }: FoliaStylePickerProps) {
       name: t(`play_detail_setting_folia_mode_${m}` as keyof Message),
       desc: t(`play_detail_folia_mode_desc_${m}` as keyof Message),
     }))
-  }, [t])
+  }, [t, langId])
 
   const blurItems = useMemo(() => {
     return BLUR_LEVELS.map(l => ({ id: l, name: t(`play_detail_folia_blur_${l}` as keyof Message) }))
-  }, [t])
+  }, [t, langId])
 
   const intensityItems = useMemo(() => {
     return FOLIA_INTENSITY_LEVELS.map(l => ({ id: l, name: t(`play_detail_folia_intensity_${l}` as keyof Message) }))
-  }, [t])
+  }, [t, langId])
 
   return (
     <>

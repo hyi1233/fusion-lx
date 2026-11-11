@@ -54,8 +54,9 @@ const LYRIC_OFFSET_SECONDS = 0.1
 
 /** 页面入口：Folia 页面把控制条与触摸手势留给宿主，所以这里 controls=0、tap=0。
  *  模式不放在 URL 里——切模式走 setMode 命令，避免每次切模式都重载整个 WebView。 */
-const buildPageUri = (baseUrl: string) => {
-  return `${baseUrl}?controls=0&tap=0`
+const buildPageUri = (baseUrl: string, langId?: string) => {
+  const lang = langId?.startsWith('zh') ? 'zh' : 'en'
+  return `${baseUrl}?controls=0&tap=0&lang=${lang}`
 }
 
 /** 只有 http(s) 的封面图能给页面用；洛雪的封面多是本地路径，WebView 取不到。 */
@@ -71,6 +72,7 @@ export default function FoliaLyricStage({ style }: FoliaLyricStageProps) {
   const { nowPlayTime, maxPlayTime } = useProgress()
   const isPlay = useIsPlay()
   const musicInfo = usePlayerMusicInfo()
+  const langId = useSettingValue('common.langId')
   const settingMode = useSettingValue('playDetail.style.foliaMode')
   // 设置里的模式可能来自旧版本/外部写入，非法值回落到默认模式（否则页面会回一条 error）。
   const mode = isFoliaVisualizerMode(settingMode) ? settingMode : DEFAULT_FOLIA_VISUALIZER_MODE
@@ -263,7 +265,7 @@ export default function FoliaLyricStage({ style }: FoliaLyricStageProps) {
     <View style={[styles.container, style]}>
       <FoliaWebView
         ref={webViewRef}
-        source={{ uri: buildPageUri(pageUrl) }}
+        source={{ uri: buildPageUri(pageUrl, langId) }}
         originWhitelist={['*']}
         javaScriptEnabled
         domStorageEnabled
