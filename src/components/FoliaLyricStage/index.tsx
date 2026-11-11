@@ -265,7 +265,7 @@ export default function FoliaLyricStage({ style }: FoliaLyricStageProps) {
     <View style={[styles.container, style]}>
       <FoliaWebView
         ref={webViewRef}
-        source={{ uri: buildPageUri(pageUrl, langId) }}
+        source={{ uri: buildPageUri(pageUrl, langId ?? undefined) }}
         originWhitelist={['*']}
         javaScriptEnabled
         domStorageEnabled
