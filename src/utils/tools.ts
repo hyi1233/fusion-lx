@@ -138,7 +138,7 @@ export const toast = (message: string, duration: 'long' | 'short' = 'short', pos
 export const openUrl = async(url: string): Promise<void> => Linking.canOpenURL(url).then(async() => Linking.openURL(url))
 
 export const assertApiSupport = (source: LX.Source): boolean => {
-  return source == 'local' || global.lx.qualityList[source] != null
+  return source == 'local' || (global.lx.qualityList && global.lx.qualityList[source] != null) || (musicSdk.supportQuality?.default && musicSdk.supportQuality.default[source] != null)
 }
 
 // const handleRemoveDataMultiple = async keys => {

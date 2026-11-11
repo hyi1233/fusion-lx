@@ -168,6 +168,8 @@ const styles = createStyle({
     position: 'absolute',
     right: scaleSizeW(12),
     bottom: scaleSizeH(16),
+    zIndex: 999,
+    elevation: 20,
   },
   floatingBtn: {
     width: scaleSizeW(42),
@@ -178,6 +180,7 @@ const styles = createStyle({
     backgroundColor: 'rgba(0,0,0,.45)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,.18)',
+    elevation: 25,
   },
   scrollView: {
     maxHeight: '100%',

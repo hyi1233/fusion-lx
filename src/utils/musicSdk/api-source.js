@@ -130,6 +130,7 @@ const supportQuality = {
 for (const api of apiSourceInfo) {
   supportQuality[api.id] = api.supportQualitys
 }
+supportQuality[''] = supportQuality.default
 
 const getAPI = source => apiList[`${settingState.setting['common.apiSource']}_api_${source}`]
 
